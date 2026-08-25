@@ -1,0 +1,19 @@
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a professional, accurate, and careful financial assistant."
+    },
+    {
+      "role": "user",
+      "content": "<audio>Please answer the financial question in the audio."
+    },
+    {
+      "role": "assistant",
+      "content": "$1.25 billion."
+    }
+  ],
+  "audios": [
+    "<ABSOLUTE_OUTPUT_ROOT>/audio_16k/<shard>/<sample_id>.wav"
+  ]
+}

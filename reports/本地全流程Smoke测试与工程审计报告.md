@@ -1,0 +1,165 @@
+# 本地全流程 Smoke 测试与工程审计报告
+
+## 1. 测试边界
+
+当前执行环境无法解析 `huggingface.co`，因此没有把离线测试冒充真实 Sujet + Edge 在线测试。
+
+本次实际运行：
+
+```text
+Sujet-schema fixture
+→ task_type == qa
+→ stable ID/split
+→ finance pronunciation normalization
+→ mock TTS（当前容器检测到 espeak，因此实际生成可听英语问题）
+→ 24 kHz mono MP3
+→ FFmpeg
+→ 16 kHz mono PCM16 WAV
+→ Audio QC
+→ messages + audios JSONL
+→ final validation/report
+```
+
+mock 只替代外部 Edge 在线合成服务，后续音频转换、QC、映射和 JSONL 全部使用正式生产代码。
+
+## 2. 实际执行结果
+
+```text
+pytest: 10 passed
+QA rows: 12
+TTS success: 12
+TTS failed: 0
+Audio QC pass: 12
+Audio QC failed: 0
+Train: 11
+Valid: 1
+Final schema errors: 0
+```
+
+## 3. WAV 实际抽检
+
+抽检结果：
+
+```text
+sample_rate = 16000
+channels = 1
+subtype = PCM_16
+container = WAV
+```
+
+本次 12 条测试音频全部通过同一 Audio QC。
+
+## 4. Answer 原样保留专项验证
+
+fixture 中故意包含：
+
+```text
+assistant_text = "Yes."
+```
+
+该记录仍然完整进入最终训练数据：
+
+```json
+{
+  "id": "310acbe0eb8f6abc4574798d2908b49d2583e9e64e6aa8675ed2eeda4326377e",
+  "source_dataset": "sujet-ai/Sujet-Finance-Instruct-177k",
+  "source_row_id": "5",
+  "upstream_dataset": "fixture-finance",
+  "task_type": "qa",
+  "source_user_text": "Is equity ownership in a company?",
+  "tts_text": "Is equity ownership in a company?",
+  "assistant_text": "Yes.",
+  "split": "train",
+  "voice": "mock-en-AU-C",
+  "voice_locale": "en-AU",
+  "rate": "-4%",
+  "pitch": "+0Hz",
+  "audio_wav": "/mnt/data/finance_audio_qwen3_omni_sujet_v1/data_test/mock/audio_16k/31/310acbe0eb8f6abc4574798d2908b49d2583e9e64e6aa8675ed2eeda4326377e.wav",
+  "duration_sec": 2.2694375,
+  "sample_rate": 16000,
+  "channels": 1,
+  "audio_subtype": "PCM_16",
+  "tts_status": "success",
+  "audio_qc": "pass",
+  "normalizer_version": "fin_en_tts_norm_v1",
+  "build_version": "sujet_audio_v1"
+}
+```
+
+这证明当前第一阶段没有对 answer 做 Yes/No、长度或语义过滤。
+
+另外 `test_source_passthrough.py` 专门使用带前导空格、换行、尾随空格的 answer，验证 source 阶段不会 strip 或重写。
+
+## 5. Qwen/ms-swift 最终结构
+
+最终记录严格为：
+
+```text
+messages + audios
+```
+
+其中：
+
+```text
+user = <audio>Please answer the financial question in the audio.
+assistant = 原始 Sujet answer
+audios = 一个绝对 WAV 路径
+```
+
+因此没有把问题 transcript 泄露到文本 user message。
+
+## 6. 幂等性 / Resume 验证
+
+对同一个 smoke output 连续执行两次 `bash run_build.sh --mode smoke`，比较全部 WAV 与 `final/*.jsonl` SHA256，结果：
+
+```text
+IDEMPOTENCY = PASS
+```
+
+## 7. 自定义输出目录验证
+
+实际执行：
+
+```text
+bash run_build.sh --mode smoke --output-root /mnt/data/finance_audio_custom_smoke
+```
+
+结果同样：
+
+```text
+final_rows = 12
+train_rows = 11
+valid_rows = 1
+final_validation_error_count = 0
+```
+
+说明测试/全量输出位置不是硬编码。
+
+## 8. Full 路径保护
+
+实际执行未带 `--output-root` 的 full：
+
+```text
+bash run_build.sh --mode full
+```
+
+程序返回 exit code 2，并拒绝启动，防止误写大量数据。
+
+## 9. 当前容器未执行
+
+受当前容器 DNS/外网限制，必须在目标服务器执行：
+
+```text
+真实 Hugging Face Sujet streaming
+真实 Edge voice discovery
+真实 Edge 5 条在线合成
+真实全量 direct-QA 构建
+```
+
+工程提供：
+
+```bash
+bash run_build.sh --mode live-smoke --limit 5
+```
+
+作为 full 前必须执行的真实 gate。

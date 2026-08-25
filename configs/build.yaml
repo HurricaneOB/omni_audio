@@ -1,0 +1,64 @@
+project:
+  name: finance_audio_qwen3_omni_sujet_v1
+  build_version: sujet_audio_v1
+  language: en
+
+source:
+  hf_id: sujet-ai/Sujet-Finance-Instruct-177k
+  split: train
+  revision: null
+  task_type: qa
+  question_field: user_prompt
+  answer_field: answer
+  provenance_field: dataset
+
+split:
+  train: 0.98
+  valid: 0.02
+  method: stable_hash
+
+tts_normalization:
+  enabled: true
+  deterministic_only: true
+  llm_rewrite: false
+  version: fin_en_tts_norm_v1
+  pronunciation_file: configs/tts_pronunciation.yaml
+
+edge_tts:
+  dynamic_voice_discovery: true
+  locales:
+    - en-US
+    - en-GB
+    - en-AU
+    - en-CA
+    - en-IE
+    - en-IN
+  one_voice_per_sample: true
+  rates:
+    - "-4%"
+    - "+0%"
+    - "+4%"
+  pitch: "+0Hz"
+  concurrency: 4
+  max_retries: 5
+  base_retry_seconds: 2
+  resumable: true
+  keep_raw_mp3: false
+
+audio:
+  sample_rate: 16000
+  channels: 1
+  codec: pcm_s16le
+  container: wav
+  min_duration_sec: 0.5
+  max_duration_sec: 60.0
+  silence_rms_threshold: 0.00001
+
+training_format:
+  system_prompt: "You are a professional, accurate, and careful financial assistant."
+  user_prompt: "<audio>Please answer the financial question in the audio."
+  audio_path_mode: absolute
+
+runtime:
+  require_gpu: false
+  run_model: false

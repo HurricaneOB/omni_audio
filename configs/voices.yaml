@@ -1,0 +1,8 @@
+# 该文件定义允许使用的英语 locale。具体 voice 名称不永久硬编码，运行时由 Edge-TTS 动态发现。
+allowed_locales:
+  - en-US
+  - en-GB
+  - en-AU
+  - en-CA
+  - en-IE
+  - en-IN

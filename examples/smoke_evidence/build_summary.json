@@ -1,0 +1,41 @@
+{
+  "audio_qc_failed_rows": 0,
+  "audio_qc_pass_rows": 12,
+  "duration_max": 5.858,
+  "duration_min": 1.311625,
+  "duration_p50": 2.68134375,
+  "duration_p90": 4.5293875,
+  "duration_p95": 5.183631249999999,
+  "duration_p99": 5.72312625,
+  "final_rows": 12,
+  "final_validation_error_count": 0,
+  "final_validation_errors": [],
+  "locale_distribution": {
+    "en-AU": 4,
+    "en-GB": 5,
+    "en-US": 3
+  },
+  "long_audio_rows": 0,
+  "qa_rows": 12,
+  "rate_distribution": {
+    "+0%": 4,
+    "+4%": 5,
+    "-4%": 3
+  },
+  "source_total_rows_seen": 14,
+  "total_audio_duration_hours": 0.009660052083333334,
+  "train_rows": 11,
+  "tts_failed_rows": 0,
+  "tts_planned_rows": 12,
+  "tts_success_rows": 12,
+  "upstream_dataset_distribution": {
+    "fixture-finance": 12
+  },
+  "valid_rows": 1,
+  "voice_distribution": {
+    "mock-en-AU-C": 4,
+    "mock-en-GB-B": 5,
+    "mock-en-US-A": 3
+  },
+  "wav_disk_usage_bytes": 1113774
+}

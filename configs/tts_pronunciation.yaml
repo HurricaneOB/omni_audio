@@ -1,0 +1,18 @@
+# 精确词典只负责“怎么读”，不负责改变问题语义。
+# key 为源文本中的精确 token/短语，value 为给 TTS 的读法。
+exact_replacements:
+  "S&P 500": "S and P 500"
+  "P/E": "P E ratio"
+  "P/B": "P B ratio"
+  "EV/EBITDA": "E V to EBITDA"
+  "10-K": "10 K"
+  "10-Q": "10 Q"
+  "8-K": "8 K"
+  "EPS": "E P S"
+  "ETF": "E T F"
+  "IPO": "I P O"
+  "SEC": "S E C"
+  "ROE": "R O E"
+  "ROA": "R O A"
+  "YoY": "year over year"
+  "QoQ": "quarter over quarter"
