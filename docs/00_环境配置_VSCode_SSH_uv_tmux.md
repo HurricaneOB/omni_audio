@@ -22,7 +22,8 @@
 测试数据允许保存在代码目录：
 
 ```text
-./data_test/mock
+./data_test/offline_structure
+./data_test/smoke_edge
 ./data_test/live
 ```
 
@@ -117,3 +118,13 @@ tmux attach -t sujet_audio_full
 ```bash
 tmux kill-session -t sujet_audio_full
 ```
+
+
+## 8. v1.0.1 smoke 网络要求
+
+- `offline-smoke`：不需要 Edge 网络，生成 `test-tone`，只测结构。
+- `smoke`：需要访问 Edge-TTS，使用本地 fixture，输出可试听真实金融问题。
+- `live-smoke`：需要 Hugging Face + Edge-TTS。
+- `full`：需要 Hugging Face（首次/无 frozen parquet 时）+ Edge-TTS。
+
+不要再把 `offline-smoke` 的测试音作为语义验收依据。

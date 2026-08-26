@@ -1,0 +1,15 @@
+Metadata-Version: 2.4
+Name: fin-audio-sujet
+Version: 1.0.0
+Summary: Sujet Finance QA -> Edge-TTS -> Qwen3-Omni audio-to-text SFT dataset builder
+Requires-Python: >=3.10
+Requires-Dist: PyYAML>=6.0.2
+Requires-Dist: numpy>=1.26
+Requires-Dist: soundfile>=0.12.1
+Requires-Dist: datasets<5,>=3.6
+Requires-Dist: pyarrow>=16
+Requires-Dist: edge-tts==7.2.8
+Requires-Dist: huggingface-hub>=0.28
+Requires-Dist: tqdm>=4.66
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"

@@ -5,22 +5,27 @@ from typing import Any
 from .ids import stable_index
 
 
-MOCK_VOICES = [
-    {"Name": "mock-en-US-A", "Locale": "en-US", "Gender": "Female"},
-    {"Name": "mock-en-GB-B", "Locale": "en-GB", "Gender": "Male"},
-    {"Name": "mock-en-AU-C", "Locale": "en-AU", "Gender": "Female"},
+# 只供 test-tone 离线结构测试使用，不代表真实 Edge voice。
+TEST_TONE_VOICES = [
+    {"Name": "test-tone-en-US-A", "Locale": "en-US", "Gender": "Test"},
+    {"Name": "test-tone-en-GB-B", "Locale": "en-GB", "Gender": "Test"},
+    {"Name": "test-tone-en-AU-C", "Locale": "en-AU", "Gender": "Test"},
 ]
+
+# 保留旧符号别名，仅避免已有第三方测试代码 import 失败；新代码不再使用 mock backend。
+MOCK_VOICES = TEST_TONE_VOICES
 
 
 async def discover_english_voices(allowed_locales: list[str], backend: str) -> list[dict[str, Any]]:
-    """动态发现英语 voice；mock 模式返回固定假 voice 供离线全链路测试。"""
-    if backend == "mock":
-        return [v for v in MOCK_VOICES if v["Locale"] in set(allowed_locales)]
+    """动态发现英语 voice；test-tone 仅返回固定测试 voice。"""
+    if backend == "test-tone":
+        allowed = set(allowed_locales)
+        return [v for v in TEST_TONE_VOICES if v["Locale"] in allowed]
 
     if backend != "edge":
         raise ValueError(f"未知 TTS backend: {backend}")
 
-    # 延迟导入，保证没有 edge-tts 时仍能运行纯离线 mock 测试。
+    # 真实 smoke/live-smoke/full 均进入这里，动态获取当前 Edge 英语 voices。
     from edge_tts import VoicesManager
 
     manager = await VoicesManager.create()

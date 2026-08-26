@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fin-audio-sujet"
-version = "1.0.0"
+version = "1.0.1"
 description = "Sujet Finance QA -> Edge-TTS -> Qwen3-Omni audio-to-text SFT dataset builder"
 requires-python = ">=3.10"
 dependencies = [

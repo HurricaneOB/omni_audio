@@ -7,7 +7,7 @@ from fin_audio.env_check import run_env_check
 
 parser = argparse.ArgumentParser(description="检查第一阶段数据构建环境")
 add_common_args(parser)
-parser.add_argument("--tts-backend", choices=["edge", "mock"], default="edge")
+parser.add_argument("--tts-backend", choices=["edge", "test-tone"], default="edge")
 parser.add_argument("--source-mode", choices=["hf", "local"], default="hf")
 args = parser.parse_args()
 report = run_env_check(args.output_root, args.tts_backend, args.source_mode)

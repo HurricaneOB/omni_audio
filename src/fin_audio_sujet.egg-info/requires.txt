@@ -1,0 +1,11 @@
+PyYAML>=6.0.2
+numpy>=1.26
+soundfile>=0.12.1
+datasets<5,>=3.6
+pyarrow>=16
+edge-tts==7.2.8
+huggingface-hub>=0.28
+tqdm>=4.66
+
+[dev]
+pytest>=8.0

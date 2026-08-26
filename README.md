@@ -1,31 +1,41 @@
-# Finance Audio Qwen3-Omni Sujet v1
+# Finance Audio Qwen3-Omni Sujet v1.0.1
 
 本工程把 `sujet-ai/Sujet-Finance-Instruct-177k` 中 `task_type == "qa"` 的 `user_prompt` 转为英文金融问题音频，原始 `answer` 原样作为文本监督，最终生成适配 Qwen3-Omni / ms-swift 的 `messages + audios` JSONL。
 
-## 三种运行模式
+## 重要：四种运行模式
 
 ```bash
-# 1. 离线工程全链路测试：不联网，不调用真实 Edge；默认写当前项目 ./data_test/mock
+# 0. 可选：纯离线结构测试。
+# 会明确生成 test-tone，只验证 MP3→WAV→QC→JSONL 链路；不能试听判断语义，也不能用于训练。
+bash run_build.sh --mode offline-smoke
+
+# 1. 推荐第一层测试：本地 12 条 fixture + 真实 Edge-TTS。
+# 生成的 WAV 必须能听到真实金融问题；默认写 ./data_test/smoke_edge
 bash run_build.sh --mode smoke
 
-# 2. 真实少量测试：真实 Hugging Face + Edge-TTS，仅处理前 5 条 QA
-bash run_build.sh --mode live-smoke --output-root ./data_test/live --limit 5
+# 2. 第二层测试：真实 Hugging Face Sujet + 真实 Edge-TTS，仅处理前 5 条 QA。
+bash run_build.sh --mode live-smoke \
+  --output-root ./data_test/live \
+  --limit 5 \
+  --hf-cache-dir /ky200t/datasets/$USER/.cache/huggingface
 
-# 3. 全量：必须显式指定 NAS 输出目录
+# 3. 全量：必须显式指定 NAS 输出目录。
 bash run_build.sh --mode full \
   --output-root /ky200t/datasets/$USER/finance_audio_qwen3_omni_sujet_v1 \
   --hf-cache-dir /ky200t/datasets/$USER/.cache/huggingface
 ```
 
-详细步骤见 `docs/01_从0到全量_逐步执行手册.md`。
+## v1.0.1 smoke 语义修复
 
-## 交付内已完成的实际测试
+旧版 `smoke` 使用 mock backend；服务器没有 `espeak` 时会隐式退化成正弦测试音。该测试音可以通过技术 Audio QC，但不包含问题语义。
 
-- `python -m compileall`：通过；
-- `pytest`：10 passed；
-- `bash run_build.sh --mode smoke`：12/12 音频 QC 通过，11 train + 1 valid，final schema error = 0；
-- 二次 smoke 重跑：WAV 与 final JSONL SHA256 一致（idempotency PASS）；
-- 自定义 `--output-root`：通过；
-- full 未指定 output root：程序主动拒绝启动。
+v1.0.1 已修复：
 
-详见 `reports/本地全流程Smoke测试与工程审计报告.md`。
+- `smoke` 固定使用真实 `Edge-TTS`；
+- 新增 `offline-smoke`，仅用于纯离线结构测试；
+- 离线测试 backend 明确命名为 `test-tone`；
+- 删除“没有 espeak 就静默回退成正弦波”的隐式逻辑；
+- 增加 `scripts/07_verify_tts_backend.py`，真实语音模式结束后强制确认 provenance 中 backend 为 `edge`；
+- 文档明确：技术 QC 不能代替语义试听验收。
+
+详细执行见 `docs/01_从0到全量_逐步执行手册.md`。
