@@ -818,8 +818,6 @@ tail -f "$LATEST_LOG"
 # 29. 查看已经生成多少 WAV
 
 
-
-
 ```bash
 find "/ky200t/datasets/fengyumeng/finance_audio_qwen3_omni_sujet_v1/audio_16k" \
   -type f \
@@ -982,6 +980,8 @@ resume 只应该用于：
 
 ```bash
 cat "$FULL_ROOT/reports/FINAL_BUILD_REPORT.md"
+
+cat "/ky200t/datasets/fengyumeng/finance_audio_qwen3_omni_sujet_v1/reports/FINAL_BUILD_REPORT.md"
 ```
 
 重点：

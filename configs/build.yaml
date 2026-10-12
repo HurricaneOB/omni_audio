@@ -1,16 +1,42 @@
 project:
   name: finance_audio_qwen3_omni_sujet_v1
-  build_version: sujet_audio_v1
+  build_version: sujet_audio_v1.2_minimal_domain_filter
   language: en
 
 source:
   hf_id: sujet-ai/Sujet-Finance-Instruct-177k
   split: train
-  revision: null
+  revision: 5e72431b6db6c339613ae809f4ae3c274ea1d0c7
   task_type: qa
   question_field: user_prompt
   answer_field: answer
   provenance_field: dataset
+
+  # v1.2 minimal fix: finance-domain gate before TTS.
+  # This policy is valid only for the pinned revision above.
+  domain_filter:
+    enabled: true
+    policy: sujet_audited_finance_qa_v1
+    fail_closed: true
+
+    # Audited direct-QA finance prefix in the pinned Sujet snapshot.
+    finance_alpaca_max_source_row_id: 62179
+
+    # Other audited finance-native direct-QA upstream source(s).
+    allowed_full_qa_datasets:
+      - adityamavle/FinRiskAnalysis
+
+    # Full scan invariants. Any mismatch aborts before TTS.
+    expected_full_scan:
+      raw_qa_rows: 38801
+      kept_rows: 6770
+      rejected_rows: 32031
+
+    # First canonical Stanford-Alpaca sample observed in the pinned Sujet layout.
+    boundary_sentinel:
+      source_row_id: 62180
+      upstream_dataset: gbharti/finance-alpaca
+      user_prompt: "Question:\nGive three tips for staying healthy."
 
 split:
   train: 0.98
